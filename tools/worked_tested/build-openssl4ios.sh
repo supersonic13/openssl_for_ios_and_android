@@ -16,6 +16,8 @@
 
 set -u
 
+source ./_shared.sh
+
 SOURCE="$0"
 while [ -h "$SOURCE" ]; do
     DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
@@ -30,15 +32,20 @@ SDKS=("iphoneos" "iphoneos" "iphoneos" "iphonesimulator" "iphonesimulator")
 PLATFORMS=("iPhoneOS" "iPhoneOS" "iPhoneOS" "iPhoneSimulator" "iPhoneSimulator")
 DEVELOPER=`xcode-select -print-path`
 # If you can't compile with this version, please modify the version to it which on your mac.
-SDK_VERSION=""10.3""
-LIB_NAME="openssl-1.1.0f"
+#SDK_VERSION=""10.3""
+SDK_VERSION=""
+#LIB_NAME="openssl-1.1.0f"
+LIB_NAME=$OPENSSL_VERSION
 LIB_DEST_DIR="${pwd_path}/../output/ios/openssl-universal"
 HEADER_DEST_DIR="include"
 rm -rf "${HEADER_DEST_DIR}" "${LIB_DEST_DIR}" "${LIB_NAME}"
+
  
 # Unarchive library, then configure and make for specified architectures
 configure_make()
 {
+   downloadOpensslTar;
+
    ARCH=$1; SDK=$2; PLATFORM=$3;
    if [ -d "${LIB_NAME}" ]; then
        rm -fr "${LIB_NAME}"

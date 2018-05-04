@@ -20,12 +20,14 @@ source ./_shared.sh
 
 # Setup architectures, library name and other vars + cleanup from previous runs
 #LIB_NAME="openssl-1.1.0f"
-LIB_NAME="openssl-1.0.2h"
+#LIB_NAME="openssl-1.0.2h"
+LIB_NAME=$OPENSSL_LIB_VERSION
 LIB_DEST_DIR=${TOOLS_ROOT}/libs
 [ -d ${LIB_DEST_DIR} ] && rm -rf ${LIB_DEST_DIR}
 [ -f "${LIB_NAME}.tar.gz" ] || wget https://www.openssl.org/source/${LIB_NAME}.tar.gz;
 # Unarchive library, then configure and make for specified architectures
 configure_make() {
+  downloadOpensslTar;
   ARCH=$1; ABI=$2;
   rm -rf "${LIB_NAME}"
   tar xfz "${LIB_NAME}.tar.gz"

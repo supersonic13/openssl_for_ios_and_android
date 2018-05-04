@@ -21,7 +21,9 @@ source ./_shared.sh cURL
 # Setup architectures, library name and other vars + cleanup from previous runs
 TOOLS_ROOT=`pwd`
 #LIB_NAME="curl-7.54.1"
-LIB_NAME="curl-7.49.1"
+#LIB_NAME="curl-7.49.1"
+LIB_NAME=$CURL_LIB_VERSION
+#LIB_NAME="curl-7.49.1"
 LIB_DEST_DIR=${TOOLS_ROOT}/libs
 [ -f ${LIB_NAME}.tar.gz ] || wget https://curl.haxx.se/download/${LIB_NAME}.tar.gz
 # Unarchive library, then configure and make for specified architectures

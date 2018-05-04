@@ -16,6 +16,8 @@
 
 set -u
 
+source ./_shared.sh
+
 SOURCE="$0"
 while [ -h "$SOURCE" ]; do
     DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
@@ -29,19 +31,26 @@ pwd_path="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 ARCHS=("arm64" "armv7s" "armv7" "i386" "x86_64")
 SDKS=("iphoneos" "iphoneos" "iphoneos" "iphonesimulator" "iphonesimulator")
 PLATFORMS=("iPhoneOS" "iPhoneOS" "iPhoneOS" "iPhoneSimulator" "iPhoneSimulator")
-LIB_NAME="curl-7.53.1"
+#LIB_NAME="curl-7.53.1"
+LIB_NAME=$CURL_VERSION
 DEVELOPER=`xcode-select -print-path`
 TOOLCHAIN=/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain
 # If you can't compile with this version, please modify the version to it which on your mac.
-SDK_VERSION=""10.3""
-IPHONEOS_DEPLOYMENT_TARGET="6.0"
+#SDK_VERSION=""10.3""
+SDK_VERSION=""
+IPHONEOS_DEPLOYMENT_TARGET="9.0"
 LIB_DEST_DIR="${pwd_path}/../output/ios/curl-universal"
 HEADER_DEST_DIR="include"
 rm -rf "${HEADER_DEST_DIR}" "${LIB_DEST_DIR}" "${LIB_NAME}"
+#--with-ssl=${OPENSSL}/Mac
+OPENSSL_DIR="${PWD}/../output/ios/openssl"
+#HOST="x86_64-apple-darwin"
  
 # Unarchive library, then configure and make for specified architectures
 configure_make()
 {
+	downloadCurlTar;
+
    ARCH=$1; SDK=$2; PLATFORM=$3;
 
    export PATH="${TOOLCHAIN}/usr/bin:${PATH}"
@@ -69,15 +78,20 @@ configure_make()
    else
        HOST="--host=${ARCH}-apple-darwin"
    fi
-   ./configure --prefix=${PREFIX_DIR} \
-       --with-sysroot=${CROSS_TOP}/SDKs/${CROSS_SDK} \
-       ${HOST} \
-       --with-darwinssl \
-       --enable-static \
-       --disable-shared \
-       --disable-verbose \
-       --enable-threaded-resolver \
-       --enable-ipv6
+   OPENSSL_PATH="${OPENSSL_DIR}-${ARCH}"
+   ./configure -prefix="${PREFIX_DIR}" -disable-shared --enable-static -with-random=/dev/urandom --with-ssl=${OPENSSL_PATH} --host=${HOST}	\
+		--with-sysroot=${CROSS_TOP}/SDKs/${CROSS_SDK}	${HOST}
+
+   #./configure --prefix=${PREFIX_DIR} \
+       #--with-sysroot=${CROSS_TOP}/SDKs/${CROSS_SDK} \
+       #${HOST} \
+       ##--with-darwinssl \
+       #--enable-static \
+       #-disable-shared \
+       #--disable-verbose \
+       #--enable-threaded-resolver \
+       #--enable-ipv6	\
+	   #--with-ssl=${OPENSSL_DIR}-${ARCH}/lib
    make clean
    if make -j8
    then

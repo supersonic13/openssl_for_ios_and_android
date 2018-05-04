@@ -2,6 +2,8 @@
 
 TOOLS_ROOT=`pwd`
 
+export ANDROID_NDK="/Users/arun/workspace/ndk/android-ndk-r15c"
+
 #
 # Warning !!! Android Build !!!
 #
@@ -27,7 +29,14 @@ TOOLS_ROOT=`pwd`
  ANDROID_API=${ANDROID_API:-21}
  ARCHS=("android" "android-armeabi" "android64-aarch64" "android-x86" "android64" "android-mips" "android-mips64")
  ABIS=("armeabi" "armeabi-v7a" "arm64-v8a" "x86" "x86_64" "mips" "mips64")
+#NDK=${ANDROID_NDK}
 NDK=${ANDROID_NDK}
+
+CURL_LIB_VERSION="7.58.0"
+OPENSSL_LIB_VERSION="1.1.0f"
+
+OPENSSL_VERSION="openssl-$OPENSSL_LIB_VERSION"
+CURL_VERSION="curl-$CURL_LIB_VERSION"
 
 configure() {
   ARCH=$1; OUT=$2; CLANG=${3:-""};
@@ -118,4 +127,34 @@ configure() {
   echo "export LDFLAGS=${LDFLAGS}"
   echo "export LIBS=${LIBS}"
   echo "**********************************************"
+}
+
+downloadOpensslTar ()
+{
+	rm -rf "${OPENSSL_VERSION}"
+
+	if [ ! -e ${OPENSSL_VERSION}.tar.gz ]; then
+		echo "Downloading ${OPENSSL_VERSION}.tar.gz"
+		curl -LO https://www.openssl.org/source/${OPENSSL_VERSION}.tar.gz
+	else
+		echo "Using ${OPENSSL_VERSION}.tar.gz"
+	fi
+
+	echo "Unpacking openssl"
+	tar xfz "${OPENSSL_VERSION}.tar.gz"
+}
+
+downloadCurlTar()
+{
+	rm -rf "${CURL_VERSION}"
+
+	if [ ! -e ${CURL_VERSION}.tar.gz ]; then
+		echo "Downloading ${CURL_VERSION}.tar.gz"
+		curl -LO https://curl.haxx.se/download/${CURL_VERSION}.tar.gz
+	else
+		echo "Using ${CURL_VERSION}.tar.gz"
+	fi
+
+	echo "Unpacking CURL"
+	tar xvf "${CURL_VERSION}.tar.gz"
 }
